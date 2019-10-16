@@ -52,7 +52,7 @@ class DataProvider
     public function hydrateCondition(AbstractCondition $condition): AbstractCondition
     {
         if (null === $this->inputQuery) {
-            return $condition;
+            throw new \LogicException('Can`t hydrate condition without input query');
         }
 
         $params = $this->getConditionParams($condition);
