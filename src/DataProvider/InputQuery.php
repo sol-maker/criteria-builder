@@ -28,17 +28,20 @@ class InputQuery
 
     /**
      * RequestQueryObject constructor.
-     * @param string[] $filter
-     * @param string[] $sorting
-     * @param string[] $search
+     * Params need be provide as key value array
+     * $filter = ['name' => 'John Foo']
+     * Where name is key from request and 'John Foo' is what we want to filter
      * @param string[] $pagination
+     * @param string[] $filter
+     * @param string[] $search
+     * @param string[] $sorting
      */
-    public function __construct(array $filter, array $sorting, array $search, array $pagination)
+    public function __construct(array $pagination = [], array $filter = [], array $search = [], array $sorting = [])
     {
+        $this->paginationParams = $pagination;
         $this->filterParams = $filter;
         $this->sortingParams = $sorting;
         $this->searchParams = $search;
-        $this->paginationParams = $pagination;
     }
 
     /**
