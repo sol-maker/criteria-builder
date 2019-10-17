@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace SolMaker;
 
 use SolMaker\Condition\AbstractCondition;
-use SolMaker\DataProvider\AbstractDataProvider;
+use SolMaker\DataProvider\DataProvider;
+use SolMaker\DataProvider\Exception\ValidationException;
 use SolMaker\Pagination\Page;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -32,7 +33,7 @@ class SearchCriteria
     protected $page;
 
     /**
-     * @var AbstractDataProvider
+     * @var DataProvider
      */
     protected $dataProvider;
 
@@ -43,18 +44,17 @@ class SearchCriteria
 
     /**
      * SearchCriteria constructor.
-     * @param AbstractDataProvider $dataProvider
+     * @param DataProvider $dataProvider
      */
-    public function __construct(
-        AbstractDataProvider $dataProvider
-    ) {
+    public function __construct(DataProvider $dataProvider)
+    {
         $this->dataProvider = $dataProvider;
     }
 
     /**
      * @param AbstractCondition $filter
      * @return $this
-     * @throws DataProvider\Exception\ValidationException
+     * @throws ValidationException
      */
     public function addFilter(AbstractCondition $filter)
     {
@@ -72,7 +72,7 @@ class SearchCriteria
     /**
      * @param AbstractCondition $search
      * @return $this
-     * @throws DataProvider\Exception\ValidationException
+     * @throws ValidationException
      */
     public function addSearches(AbstractCondition $search)
     {
@@ -90,7 +90,7 @@ class SearchCriteria
     /**
      * @param AbstractCondition $sort
      * @return $this
-     * @throws DataProvider\Exception\ValidationException
+     * @throws ValidationException
      */
     public function addSorting(AbstractCondition $sort)
     {
