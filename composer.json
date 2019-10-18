@@ -1,5 +1,6 @@
 {
     "name": "sol-maker/criteria-builder",
+    "version": "0.0.1",
     "authors": [
         {
             "name": "sol-maker",
@@ -13,7 +14,7 @@
     "autoload": {
         "psr-4": {
             "SolMaker\\": "src/",
-            "SolMaker\\Unit": "tests/Unit"
+            "SolMaker\\Unit\\": "tests/Unit"
         }
     },
     "require-dev": {
