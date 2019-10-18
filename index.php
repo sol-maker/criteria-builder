@@ -6,15 +6,12 @@ use Symfony\Component\Validator\Validation;
 
 require_once './vendor/autoload.php';
 
-$input = new \SolMaker\DataProvider\InputQuery([
-    'name' => 'Foo',
-//    'sex' => 'male'
-], [], [], []);
+$input = new \SolMaker\DataProvider\InputQuery([],['name' => 'Name']);
 
 $defaultDataProvider = new \SolMaker\DataProvider\DataProvider(Validation::createValidator());
 $defaultDataProvider->provideInput($input);
-
 $searchCriteria = new \SolMaker\SearchCriteria($defaultDataProvider);
+
 try {
 
     $searchCriteria

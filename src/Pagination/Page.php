@@ -33,20 +33,14 @@ class Page
      * Pagination constructor.
      * @param int $page
      * @param int $limit
-     * @param int $offset
      */
     public function __construct(
         int $page = self::DEFAULT_FIRST_PAGE,
-        int $limit = self::DEFAULT_PAGE_LIMIT,
-        int $offset = self::DEFAULT_PAGE_OFFSET
+        int $limit = self::DEFAULT_PAGE_LIMIT
     ) {
         $this->page = $page;
         $this->limit = $limit;
-        if (0 === $offset) {
-            $this->offset = ($this->page - 1) * $limit;
-        } else {
-            $this->offset = $offset;
-        }
+        $this->offset = ($this->page - 1) * $limit;
     }
 
     /**

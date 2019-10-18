@@ -8,12 +8,19 @@ use SolMaker\Condition\AbstractCondition;
 use SolMaker\Condition\AbstractRangeCondition;
 use SolMaker\DataProvider\Exception\ValidationException;
 use SolMaker\Filter\Filter;
+use SolMaker\Pagination\Page;
 use SolMaker\Search\Search;
 use SolMaker\Sorting\Sorting;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class DataProvider
 {
+    public const PAGINATION_DEFAULT_KEY = 'pages';
+    public const PAGINATION_PAGE = 'page';
+    public const PAGINATION_LIMIT = 'limit';
+
     /**
      * @var ValidatorInterface
      */
@@ -79,6 +86,48 @@ class DataProvider
     }
 
     /**
+     * @param string $pagesKey
+     * @param string $pageKey
+     * @param string $limitKey
+     * @return Page
+     */
+    public function getPaginationParams(
+        $pagesKey = self::PAGINATION_DEFAULT_KEY,
+        $pageKey = self::PAGINATION_PAGE,
+        $limitKey = self::PAGINATION_LIMIT
+    ): Page {
+        if (null === $this->inputQuery) {
+            return new Page();
+        }
+
+        $params = $this->inputQuery->getPaginationParams();
+        if (!isset($params[$pagesKey])) {
+            return new Page();
+        }
+
+        $page = $params[$pagesKey][$pageKey] ?? Page::DEFAULT_FIRST_PAGE;
+        $limit = $params[$pagesKey][$limitKey] ?? Page::DEFAULT_PAGE_LIMIT;
+        $validationRules = [
+            new Type('int'),
+            new Length(['min' => 1, 'max' => (PHP_INT_MAX / 2)])
+        ];
+
+        $pageErrors = $this->validator->validate($page, $validationRules);
+
+        if (0 != count($pageErrors)) {
+            $page = Page::DEFAULT_FIRST_PAGE;
+        }
+
+        $limitErrors = $this->validator->validate($limit, $validationRules);
+
+        if (0 != count($limitErrors)) {
+            $limit = Page::DEFAULT_PAGE_LIMIT;
+        }
+
+        return new Page($page, $limit);
+    }
+
+    /**
      * @param AbstractCondition $condition
      * @return array|string[]
      */
@@ -96,5 +145,4 @@ class DataProvider
 
         return $params;
     }
-
 }

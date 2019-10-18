@@ -74,9 +74,9 @@ class SearchCriteria
      * @return $this
      * @throws ValidationException
      */
-    public function addSearches(AbstractCondition $search)
+    public function addSearch(AbstractCondition $search)
     {
-        $search = $this->dataProvider->hydrateCondition($search->getRequestFieldName());
+        $search = $this->dataProvider->hydrateCondition($search);
 
         if (!$search->isHasValue()) {
             return $this;
@@ -94,7 +94,7 @@ class SearchCriteria
      */
     public function addSorting(AbstractCondition $sort)
     {
-        $sort = $this->dataProvider->hydrateCondition($sort->getRequestFieldName());
+        $sort = $this->dataProvider->hydrateCondition($sort);
 
         if (!$sort->isHasValue()) {
             return $this;
@@ -103,6 +103,19 @@ class SearchCriteria
         $this->sorting[] = $sort;
 
         return $this;
+    }
+
+    /**
+     * @param string $pagesKey
+     * @param string $pageKey
+     * @param string $limitKey
+     */
+    public function addPagination(
+        $pagesKey = DataProvider::PAGINATION_DEFAULT_KEY,
+        $pageKey = DataProvider::PAGINATION_PAGE,
+        $limitKey = DataProvider::PAGINATION_LIMIT
+    ) {
+        $this->page = $this->dataProvider->getPaginationParams();
     }
 
     /**
@@ -136,5 +149,4 @@ class SearchCriteria
     {
         return $this->page;
     }
-
 }
