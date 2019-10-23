@@ -12,6 +12,14 @@ class Sorting extends AbstractCondition
     const DESC = 'DESC';
 
     /**
+     * @var string[]
+     */
+    private $availableValues = [
+        self::ASC,
+        self::DESC
+    ];
+
+    /**
      * @return mixed
      */
     public function getValue()
@@ -20,7 +28,17 @@ class Sorting extends AbstractCondition
             throw new \LogicException('The value Must be initialize.');
         }
 
-        return $this->value == 1 ? self::ASC : self::DESC;
+        if (is_numeric($this->value)) {
+            $normalizedValue = (int) $this->value;
+            return ($normalizedValue === 1) ? self::ASC : self::DESC;
+        }
+
+        $normalizedValue = mb_strtoupper($this->value);
+        if (!in_array($normalizedValue, $this->availableValues)) {
+            return self::DESC;
+        }
+
+        return $normalizedValue;
     }
 
 }

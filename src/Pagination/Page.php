@@ -64,6 +64,10 @@ class Page
      */
     public function getOffset(): int
     {
+        if ($this->offset < self::DEFAULT_PAGE_OFFSET) {
+            return self::DEFAULT_PAGE_OFFSET;
+        }
+
         return $this->offset;
     }
 }
