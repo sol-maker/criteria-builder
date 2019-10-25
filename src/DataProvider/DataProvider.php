@@ -52,12 +52,16 @@ class DataProvider
     }
 
     /**
-     * @param AbstractCondition $condition
+     * @param mixed $condition
      * @return AbstractCondition
      * @throws ValidationException
      */
-    public function hydrateCondition(AbstractCondition $condition): AbstractCondition
+    public function hydrateCondition($condition): AbstractCondition
     {
+        if (!$condition instanceof AbstractCondition) {
+            throw new \LogicException('Condition must be AbstractCondition');
+        }
+
         if (null === $this->inputQuery) {
             throw new \LogicException('Can`t hydrate condition without input query');
         }

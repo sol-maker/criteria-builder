@@ -7,7 +7,10 @@ namespace SolMaker;
 use SolMaker\Condition\AbstractCondition;
 use SolMaker\DataProvider\DataProvider;
 use SolMaker\DataProvider\Exception\ValidationException;
+use SolMaker\Filter\Filter;
 use SolMaker\Pagination\Page;
+use SolMaker\Search\Search;
+use SolMaker\Sorting\Sorting;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SearchCriteria
@@ -52,11 +55,11 @@ class SearchCriteria
     }
 
     /**
-     * @param AbstractCondition $filter
+     * @param Filter $filter
      * @return $this
      * @throws ValidationException
      */
-    public function addFilter(AbstractCondition $filter)
+    public function addFilter(Filter $filter)
     {
         $filterHydrated = $this->dataProvider->hydrateCondition($filter);
 
@@ -70,11 +73,11 @@ class SearchCriteria
     }
 
     /**
-     * @param AbstractCondition $search
+     * @param Search $search
      * @return $this
      * @throws ValidationException
      */
-    public function addSearch(AbstractCondition $search)
+    public function addSearch(Search $search)
     {
         $search = $this->dataProvider->hydrateCondition($search);
 
@@ -88,11 +91,11 @@ class SearchCriteria
     }
 
     /**
-     * @param AbstractCondition $sort
+     * @param Sorting $sort
      * @return $this
      * @throws ValidationException
      */
-    public function addSorting(AbstractCondition $sort)
+    public function addSorting(Sorting $sort)
     {
         $sort = $this->dataProvider->hydrateCondition($sort);
 
