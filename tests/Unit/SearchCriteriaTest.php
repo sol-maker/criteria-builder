@@ -94,9 +94,7 @@ class SearchCriteriaTest extends TestCase
 
     public function testAddPagination()
     {
-        $inputData = new InputQuery(
-            ['pages' => ['page' => 2, 'limit' => 30]]
-        );
+        $inputData = new InputQuery(['page' => 2, 'limit' => 30]);
 
         $dataProvider = new DataProvider($this->validator);
         $dataProvider->provideInput($inputData);

@@ -94,13 +94,11 @@ class DataProvider
     }
 
     /**
-     * @param string $pagesKey
      * @param string $pageKey
      * @param string $limitKey
      * @return Page
      */
     public function getPaginationParams(
-        $pagesKey = self::PAGINATION_DEFAULT_KEY,
         $pageKey = self::PAGINATION_PAGE,
         $limitKey = self::PAGINATION_LIMIT
     ): Page {
@@ -109,24 +107,24 @@ class DataProvider
         }
 
         $params = $this->inputQuery->getPaginationParams();
-        if (!isset($params[$pagesKey])) {
+        if (empty($params)) {
             return new Page();
         }
 
-        $page = $params[$pagesKey][$pageKey] ?? Page::DEFAULT_FIRST_PAGE;
-        $limit = $params[$pagesKey][$limitKey] ?? Page::DEFAULT_PAGE_LIMIT;
+        $page = $params[$pageKey] ?? Page::DEFAULT_FIRST_PAGE;
+        $limit = $params[$limitKey] ?? Page::DEFAULT_PAGE_LIMIT;
         $validationRules = [
             new Type('int'),
             new Length(['min' => 1, 'max' => (PHP_INT_MAX / 2)])
         ];
 
-        $pageErrors = $this->validator->validate($page, $validationRules);
+        $pageErrors = $this->validator->validate((int)$page, $validationRules);
 
         if (0 != count($pageErrors)) {
             $page = Page::DEFAULT_FIRST_PAGE;
         }
 
-        $limitErrors = $this->validator->validate($limit, $validationRules);
+        $limitErrors = $this->validator->validate((int)$limit, $validationRules);
 
         if (0 != count($limitErrors)) {
             $limit = Page::DEFAULT_PAGE_LIMIT;
