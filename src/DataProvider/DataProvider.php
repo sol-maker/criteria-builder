@@ -79,11 +79,11 @@ class DataProvider
             throw new ValidationException($errors);
         }
 
+        $condition->setValue($value);
+
         if ($condition instanceof AbstractRangeCondition) {
             $condition->setValueStart($value[AbstractRangeCondition::START]);
             $condition->setValueEnd($value[AbstractRangeCondition::END]);
-        } else {
-            $condition->setValue($value);
         }
 
         return $condition;
