@@ -82,8 +82,12 @@ class DataProvider
         $condition->setValue($value);
 
         if ($condition instanceof AbstractRangeCondition) {
-            $condition->setValueStart($value[AbstractRangeCondition::START]);
-            $condition->setValueEnd($value[AbstractRangeCondition::END]);
+            if (array_key_exists(AbstractRangeCondition::START, $value)) {
+                $condition->setValueStart($value[AbstractRangeCondition::START]);
+            }
+            if (array_key_exists(AbstractRangeCondition::END, $value)) {
+                $condition->setValueEnd($value[AbstractRangeCondition::END]);
+            }
         }
 
         return $condition;

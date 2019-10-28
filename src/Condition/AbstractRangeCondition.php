@@ -51,4 +51,20 @@ abstract class AbstractRangeCondition extends AbstractCondition
         return $this->valueEnd;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasStart()
+    {
+        return null !== $this->getValueStart();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasEnd()
+    {
+        return null !== $this->getValueEnd();
+    }
+
 }
