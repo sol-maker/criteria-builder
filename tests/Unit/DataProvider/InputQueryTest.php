@@ -6,33 +6,28 @@ namespace SolMaker\Unit\DataProvider;
 
 use PHPUnit\Framework\TestCase;
 use SolMaker\DataProvider\InputQuery;
+use SolMaker\Pagination\Page;
 
 class InputQueryTest extends TestCase
 {
     public function testInputParameterPagination()
     {
-        $paginationParams = ['pages' => ['limit'=>10, 'page' => 1]];
-        $inputQuery = new InputQuery($paginationParams);
+        $inputQuery = new InputQuery(new Page());
 
         $this->assertEquals($inputQuery->getSortingParams(), []);
         $this->assertEquals($inputQuery->getSearchParams(), []);
         $this->assertEquals($inputQuery->getFilterParams(), []);
 
         $params = $inputQuery->getPaginationParams();
-        $this->assertArrayHasKey('pages', $params);
-        $this->assertArrayHasKey('page', $params['pages']);
-        $this->assertArrayHasKey('limit', $params['pages']);
-
-        $this->assertEquals(10, $params['pages']['limit']);
-        $this->assertEquals(1, $params['pages']['page']);
+        $this->assertEquals(10, $params->getLimit());
+        $this->assertEquals(1, $params->getPage());
     }
 
     public function testInputParameterFilter()
     {
         $filter = ['name' => 'Foo'];
-        $inputQuery = new InputQuery([],$filter, [], []);
+        $inputQuery = new InputQuery(new Page(),$filter, [], []);
 
-        $this->assertEquals($inputQuery->getPaginationParams(), []);
         $this->assertEquals($inputQuery->getSortingParams(), []);
         $this->assertEquals($inputQuery->getSearchParams(), []);
         $params = $inputQuery->getFilterParams();
@@ -44,9 +39,8 @@ class InputQueryTest extends TestCase
     public function testInputParameterSearch()
     {
         $search = ['name' => 'Foo'];
-        $inputQuery = new InputQuery([],[], $search, []);
+        $inputQuery = new InputQuery(new Page(),[], $search, []);
 
-        $this->assertEquals($inputQuery->getPaginationParams(), []);
         $this->assertEquals($inputQuery->getFilterParams(), []);
         $this->assertEquals($inputQuery->getSortingParams(), []);
         $params = $inputQuery->getSearchParams();
@@ -58,9 +52,8 @@ class InputQueryTest extends TestCase
     public function testInputParameterSorting()
     {
         $sorting = ['name' => 1];
-        $inputQuery = new InputQuery([],[], [], $sorting);
+        $inputQuery = new InputQuery(new Page(),[], [], $sorting);
 
-        $this->assertEquals($inputQuery->getPaginationParams(), []);
         $this->assertEquals($inputQuery->getFilterParams(), []);
         $this->assertEquals($inputQuery->getSearchParams(), []);
         $params = $inputQuery->getSortingParams();

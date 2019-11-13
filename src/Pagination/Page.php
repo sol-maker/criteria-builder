@@ -34,12 +34,19 @@ class Page
      * @param int $page
      * @param int $limit
      */
-    public function __construct(
-        int $page = self::DEFAULT_FIRST_PAGE,
-        int $limit = self::DEFAULT_PAGE_LIMIT
-    ) {
-        $this->page = $page;
-        $this->limit = $limit;
+    public function __construct($page = self::DEFAULT_FIRST_PAGE, $limit = self::DEFAULT_PAGE_LIMIT)
+    {
+        $this->page = (int) $page;
+        $this->limit = (int) $limit;
+
+        if ($this->page <= 0 || $this->page > (PHP_INT_MAX / 2)) {
+            $this->page = self::DEFAULT_FIRST_PAGE;
+        }
+
+        if ($this->limit <= 0 || $this->limit > (PHP_INT_MAX / 2)) {
+            $this->limit = self::DEFAULT_PAGE_LIMIT;
+        }
+
         $this->offset = ($this->page - 1) * $limit;
     }
 

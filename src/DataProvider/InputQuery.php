@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SolMaker\DataProvider;
 
+use SolMaker\Pagination\Page;
+
 class InputQuery
 {
     /**
@@ -22,23 +24,27 @@ class InputQuery
     protected $searchParams = [];
 
     /**
-     * @var string[]
+     * @var Page
      */
-    protected $paginationParams = [];
+    protected $paginationParams;
 
     /**
      * RequestQueryObject constructor.
      * Params need be provide as key value array
      * $filter = ['name' => 'John Foo']
      * Where name is key from request and 'John Foo' is what we want to filter
-     * @param string[] $pagination
+     * @param Page $paginationParams
      * @param string[] $filter
      * @param string[] $search
      * @param string[] $sorting
      */
-    public function __construct(array $pagination = [], array $filter = [], array $search = [], array $sorting = [])
-    {
-        $this->paginationParams = $pagination;
+    public function __construct(
+        Page $paginationParams,
+        array $filter = [],
+        array $search = [],
+        array $sorting = []
+    ) {
+        $this->paginationParams = $paginationParams;
         $this->filterParams = $filter;
         $this->sortingParams = $sorting;
         $this->searchParams = $search;
@@ -69,9 +75,9 @@ class InputQuery
     }
 
     /**
-     * @return string[]
+     * @return Page
      */
-    public function getPaginationParams(): array
+    public function getPaginationParams(): Page
     {
         return $this->paginationParams;
     }

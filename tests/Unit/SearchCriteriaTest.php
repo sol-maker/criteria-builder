@@ -34,9 +34,8 @@ class SearchCriteriaTest extends TestCase
 
     public function testAddEmptyFilter()
     {
-        $inputData = new InputQuery();
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
+        $inputData = new InputQuery(new Page());
+        $dataProvider = new DataProvider($inputData, $this->validator);
 
         $searchCriteria = new SearchCriteria($dataProvider);
         $searchCriteria
@@ -49,9 +48,9 @@ class SearchCriteriaTest extends TestCase
 
     public function testAddEmptySearch()
     {
-        $inputData = new InputQuery();
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
+        $inputData = new InputQuery(new Page());
+        $dataProvider = new DataProvider($inputData, $this->validator);
+
         $searchCriteria = new SearchCriteria($dataProvider);
         $searchCriteria
             ->addSearch(new LikeAround('name'));
@@ -63,9 +62,8 @@ class SearchCriteriaTest extends TestCase
 
     public function testAddEmptySorting()
     {
-        $inputData = new InputQuery();
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
+        $inputData = new InputQuery(new Page());
+        $dataProvider = new DataProvider($inputData, $this->validator);
 
         $searchCriteria = new SearchCriteria($dataProvider);
         $searchCriteria
@@ -78,12 +76,11 @@ class SearchCriteriaTest extends TestCase
 
     public function testAddEmptyPagination()
     {
-        $inputData = new InputQuery();
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
+        $inputData = new InputQuery(new Page());
+        $dataProvider = new DataProvider($inputData, $this->validator);
 
         $searchCriteria = new SearchCriteria($dataProvider);
-        $searchCriteria->addPagination();
+        $searchCriteria->allowPaginate();
 
         $page = $searchCriteria->getPage();
         $this->assertInstanceOf(Page::class, $page);
@@ -94,13 +91,10 @@ class SearchCriteriaTest extends TestCase
 
     public function testAddPagination()
     {
-        $inputData = new InputQuery(['page' => 2, 'limit' => 30]);
-
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
-
+        $inputData = new InputQuery(new Page(2,30));
+        $dataProvider = new DataProvider($inputData, $this->validator);
         $searchCriteria = new SearchCriteria($dataProvider);
-        $searchCriteria->addPagination();
+        $searchCriteria->allowPaginate();
 
         $page = $searchCriteria->getPage();
         $this->assertInstanceOf(Page::class, $page);
@@ -112,10 +106,8 @@ class SearchCriteriaTest extends TestCase
 
     public function testFiltersParameters()
     {
-        $inputData = new InputQuery([], ['name' => 'Foo', 'last_name' => 'Bar']);
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
-
+        $inputData = new InputQuery(new Page(), ['name' => 'Foo', 'last_name' => 'Bar']);
+        $dataProvider = new DataProvider($inputData, $this->validator);
         $searchCriteria = new SearchCriteria($dataProvider);
         $searchCriteria
             ->addFilter(new Equal('name', [], 'firstName'))
@@ -136,16 +128,14 @@ class SearchCriteriaTest extends TestCase
 
     public function testSearchParameters()
     {
-        $inputData = new InputQuery([], [], ['patronymic' => 'Andre']);
-        $dataProvider = new DataProvider($this->validator);
-
-        $dataProvider->provideInput($inputData);
+        $inputData = new InputQuery(new Page(), [], ['patronymic' => 'Andre']);
+        $dataProvider = new DataProvider($inputData, $this->validator);
         $searchCriteria = new SearchCriteria($dataProvider);
         $searchCriteria
             ->addSearch(new LikeAfter('patronymic'))
-            ->addPagination();
-        $searches = $searchCriteria->getSearches();
+            ->allowPaginate();
 
+        $searches = $searchCriteria->getSearches();
         $this->assertIsArray($searches);
         $this->assertInstanceOf(Search::class, $searches[0]);
         $this->assertEquals($searches[0]->getValue(), 'Andre');
@@ -155,9 +145,8 @@ class SearchCriteriaTest extends TestCase
 
     public function testSortingParameters()
     {
-        $inputData = new InputQuery([], [], [], ['id' => -1]);
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($inputData);
+        $inputData = new InputQuery(new Page(), [], [], ['id' => -1]);
+        $dataProvider = new DataProvider($inputData, $this->validator);
         $searchCriteria = new SearchCriteria($dataProvider);
         $searchCriteria
             ->addSorting(new Sorting('id'));

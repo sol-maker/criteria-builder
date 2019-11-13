@@ -11,16 +11,10 @@ use SolMaker\Filter\Filter;
 use SolMaker\Pagination\Page;
 use SolMaker\Search\Search;
 use SolMaker\Sorting\Sorting;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class DataProvider
 {
-    public const PAGINATION_DEFAULT_KEY = 'pages';
-    public const PAGINATION_PAGE = 'page';
-    public const PAGINATION_LIMIT = 'limit';
-
     /**
      * @var ValidatorInterface
      */
@@ -33,39 +27,24 @@ class DataProvider
 
     /**
      * AbstractDataProvider constructor.
+     * @param InputQuery $inputQuery
      * @param ValidatorInterface $validator
      */
-    public function __construct(ValidatorInterface $validator)
-    {
+    public function __construct(
+        InputQuery $inputQuery,
+        ValidatorInterface $validator
+    ) {
+        $this->inputQuery = $inputQuery;
         $this->validator = $validator;
     }
 
     /**
-     * @param InputQuery $inputQuery
-     * @return DataProvider
-     */
-    public function provideInput(InputQuery $inputQuery)
-    {
-        $this->inputQuery = $inputQuery;
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $condition
+     * @param Filter|Sorting|Search|AbstractCondition $condition
      * @return AbstractCondition
      * @throws ValidationException
      */
-    public function hydrateCondition($condition): AbstractCondition
+    public function hydrateCondition(AbstractCondition $condition): AbstractCondition
     {
-        if (!$condition instanceof AbstractCondition) {
-            throw new \LogicException('Condition must be AbstractCondition');
-        }
-
-        if (null === $this->inputQuery) {
-            throw new \LogicException('Can`t hydrate condition without input query');
-        }
-
         $params = $this->getConditionParams($condition);
 
         if (!array_key_exists($condition->getRequestFieldName(), $params)) {
@@ -94,43 +73,11 @@ class DataProvider
     }
 
     /**
-     * @param string $pageKey
-     * @param string $limitKey
      * @return Page
      */
-    public function getPaginationParams(
-        $pageKey = self::PAGINATION_PAGE,
-        $limitKey = self::PAGINATION_LIMIT
-    ): Page {
-        if (null === $this->inputQuery) {
-            return new Page();
-        }
-
-        $params = $this->inputQuery->getPaginationParams();
-        if (empty($params)) {
-            return new Page();
-        }
-
-        $page = $params[$pageKey] ?? Page::DEFAULT_FIRST_PAGE;
-        $limit = $params[$limitKey] ?? Page::DEFAULT_PAGE_LIMIT;
-        $validationRules = [
-            new Type('int'),
-            new Length(['min' => 1, 'max' => (PHP_INT_MAX / 2)])
-        ];
-
-        $pageErrors = $this->validator->validate((int)$page, $validationRules);
-
-        if (0 != count($pageErrors)) {
-            $page = Page::DEFAULT_FIRST_PAGE;
-        }
-
-        $limitErrors = $this->validator->validate((int)$limit, $validationRules);
-
-        if (0 != count($limitErrors)) {
-            $limit = Page::DEFAULT_PAGE_LIMIT;
-        }
-
-        return new Page($page, $limit);
+    public function getPaginationParams(): Page
+    {
+        return $this->inputQuery->getPaginationParams();
     }
 
     /**

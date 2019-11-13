@@ -11,6 +11,7 @@ use SolMaker\DataProvider\Exception\ValidationException;
 use SolMaker\DataProvider\InputQuery;
 use SolMaker\Filter\Equal;
 use SolMaker\Filter\Filter;
+use SolMaker\Pagination\Page;
 use SolMaker\Search\LikeAround;
 use SolMaker\Search\Search;
 use SolMaker\Sorting\Sorting;
@@ -38,16 +39,15 @@ class DataProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->inputData = new InputQuery([],[],[],[]);
+        $this->inputData = new InputQuery(new Page(),[],[],[]);
         $this->validator = Validation::createValidator();
-        $this->dataProvider = new DataProvider($this->validator);
+        $this->dataProvider = new DataProvider($this->inputData, $this->validator);
     }
 
     public function testHydrateConditionWithEmptyInput()
     {
         $condition = new Equal('foo');
 
-        $this->expectException(\LogicException::class);
         $returnedCondition = $this->dataProvider->hydrateCondition($condition);
         $this->assertInstanceOf(Equal::class, $returnedCondition);
 
@@ -58,10 +58,8 @@ class DataProviderTest extends TestCase
 
     public function testHydrateConditionWithInput()
     {
-        $dataProvider = new DataProvider($this->validator);
+        $dataProvider = new DataProvider($this->inputData, $this->validator);
         $condition = new Equal('foo');
-
-        $dataProvider->provideInput($this->inputData);
 
         $hydratedValue = $dataProvider->hydrateCondition($condition);
         $this->expectException(\LogicException::class);
@@ -70,27 +68,24 @@ class DataProviderTest extends TestCase
 
     public function testValidation()
     {
-        $this->inputData = new InputQuery([],['name' => 'foo'],[],[]);
+        $this->inputData = new InputQuery(new Page(),['name' => 'foo'],[],[]);
         $condition = new Equal('name', [
             new Length(['min' => 10])
         ]);
 
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($this->inputData);
-
+        $dataProvider = new DataProvider($this->inputData, $this->validator);
         $this->expectException(ValidationException::class);
         $dataProvider->hydrateCondition($condition);
     }
 
     public function testValidationWork()
     {
-        $this->inputData = new InputQuery([],['name' => 'foo bar'],[],[]);
+        $this->inputData = new InputQuery(new Page(),['name' => 'foo bar'],[],[]);
         $condition = new Equal('name', [
             new Length(['min' => 7])
         ]);
 
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($this->inputData);
+        $dataProvider = new DataProvider($this->inputData, $this->validator);
         $dataProvider->hydrateCondition($condition);
 
         $this->assertEquals($condition->getValue(), 'foo bar');
@@ -98,8 +93,7 @@ class DataProviderTest extends TestCase
 
     public function testPrivateGetParamMethod()
     {
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput($this->inputData);
+        $dataProvider = new DataProvider($this->inputData, $this->validator);
 
         $this->expectException(\LogicException::class);
         $dataProvider->hydrateCondition(new class('foo') extends AbstractCondition {});
@@ -107,8 +101,7 @@ class DataProviderTest extends TestCase
 
     public function testPrivateGetParamMethodForFilters()
     {
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput(new InputQuery([], ['name' => 'Foo']));
+        $dataProvider = new DataProvider(new InputQuery(new Page(), ['name' => 'Foo']), $this->validator);
         $filter = new Equal('name');
 
         $dataProvider->hydrateCondition($filter);
@@ -118,8 +111,7 @@ class DataProviderTest extends TestCase
 
     public function testPrivateGetParamMethodForSearch()
     {
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput(new InputQuery([], [], ['last_name' => 'Don']));
+        $dataProvider = new DataProvider(new InputQuery(new Page(), [], ['last_name' => 'Don']), $this->validator);
 
         $likeAround = new LikeAround('last_name');
         $dataProvider->hydrateCondition($likeAround);
@@ -129,15 +121,28 @@ class DataProviderTest extends TestCase
 
     public function testPrivateGetParamMethodForSorting()
     {
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput(new InputQuery([], [], [], ['name' => 1]));
-
+        $dataProvider = new DataProvider(new InputQuery(new Page(), [], [], ['name' => 1]), $this->validator);
         $sorting = new Sorting('name');
         $dataProvider->hydrateCondition($sorting);
         $this->assertEquals($sorting->getValue(), Sorting::ASC);
         $this->assertInstanceOf(Sorting::class, $sorting);
 
-        $dataProvider->provideInput(new InputQuery([], [], [], ['name' => -1]));
+        $dataProvider = new DataProvider(new InputQuery(new Page, [], [], ['name' => -1]), $this->validator);
+        $dataProvider->hydrateCondition($sorting);
+
+        $this->assertEquals($sorting->getValue(), Sorting::DESC);
+        $this->assertInstanceOf(Sorting::class, $sorting);
+    }
+
+    public function testPrivateGetParamMethodForSortingString()
+    {
+        $dataProvider = new DataProvider(new InputQuery(new Page(), [], [], ['name' => 'asc']), $this->validator);
+        $sorting = new Sorting('name');
+        $dataProvider->hydrateCondition($sorting);
+        $this->assertEquals($sorting->getValue(), Sorting::ASC);
+        $this->assertInstanceOf(Sorting::class, $sorting);
+
+        $dataProvider = new DataProvider(new InputQuery(new Page, [], [], ['name' => 'desc']), $this->validator);
         $dataProvider->hydrateCondition($sorting);
 
         $this->assertEquals($sorting->getValue(), Sorting::DESC);
@@ -146,9 +151,7 @@ class DataProviderTest extends TestCase
 
     public function testWrongKeyForInput()
     {
-        $dataProvider = new DataProvider($this->validator);
-        $dataProvider->provideInput(new InputQuery([], [], [], ['name' => 1]));
-
+        $dataProvider = new DataProvider(new InputQuery(new Page(), [], [], ['name' => 1]), $this->validator);
         $sorting = new Sorting('name_wrong');
         $dataProvider->hydrateCondition($sorting);
 

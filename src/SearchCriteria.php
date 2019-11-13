@@ -109,15 +109,10 @@ class SearchCriteria
     }
 
     /**
-     * @param string $pagesKey
-     * @param string $pageKey
-     * @param string $limitKey
+     * Allow pagination to query builder
      */
-    public function addPagination(
-        $pagesKey = DataProvider::PAGINATION_DEFAULT_KEY,
-        $pageKey = DataProvider::PAGINATION_PAGE,
-        $limitKey = DataProvider::PAGINATION_LIMIT
-    ) {
+    public function allowPaginate()
+    {
         $this->page = $this->dataProvider->getPaginationParams();
     }
 
