@@ -11,7 +11,6 @@ use SolMaker\Filter\Filter;
 use SolMaker\Pagination\Page;
 use SolMaker\Search\Search;
 use SolMaker\Sorting\Sorting;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SearchCriteria
 {
@@ -39,11 +38,6 @@ class SearchCriteria
      * @var DataProvider
      */
     protected $dataProvider;
-
-    /**
-     * @var ValidatorInterface
-     */
-    protected $validator;
 
     /**
      * SearchCriteria constructor.
