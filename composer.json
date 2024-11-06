@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": "^7.1",
-        "symfony/validator": "^4.3"
+        "symfony/validator": "^5.4"
     },
     "autoload": {
         "psr-4": {
